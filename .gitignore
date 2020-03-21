@@ -1,0 +1,18 @@
+#########
+# macOS #
+#########
+
+# General
+.DS_Store
+
+
+
+###########
+# Windows #
+###########
+
+# Thumbnail cache
+[Tt]humbs.db
+
+# Folder configuration
+[Dd]esktop.ini
