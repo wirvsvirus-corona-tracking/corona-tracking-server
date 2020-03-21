@@ -9,31 +9,50 @@ include_once '../entities/profile.php';
 
 $data = json_decode(file_get_contents("php://input"));
 
-if (empty($data->guid) || empty($data->passphrase))
+if (empty($data->guid))
 {
     echo '{';
-      echo '"status_code": -1';
+    echo '    "status_code": -1';
     echo '}';
 }
 else
 {
     $database = new Database();
     $connection = $database->getConnection();
-    $profile = new Profile($connection);
 
+    $profile = new Profile($connection);
     $profile->$guid = $data->guid;
-    $profile->$passphrase = $data->passphrase;
+
+    $statement = $profile->find();
+    $count = $statement->rowCount();
+
+    if ($count > 0)
+    {
+        while ($row = $statement->fetch(PDO::FETCH_ASSOC))
+        {
+            extract($row);
+
+            $item = array
+            (
+                  "id" => $id,
+                  "guid" => $guid,
+                  "state_id" => $state_id
+            );
+
+            $profile->id = $item["id"];
+        }
+    }
 
     if ($profile->delete())
     {
         echo '{';
-            echo '"status_code": 0';
+        echo '    "status_code": 0';
         echo '}';
     }
     else
     {
         echo '{';
-            echo '"status_code": -1';
+        echo '    "status_code": -1';
         echo '}';
     }
 }

@@ -1,7 +1,3 @@
-CREATE DATABASE corona_tracker;
-
-USE corona_tracker;
-
 CREATE TABLE IF NOT EXISTS state
 (
     id   INT(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID of the state.',
@@ -15,7 +11,6 @@ CREATE TABLE IF NOT EXISTS profile
 (
     id         INT(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID of the profile.',
     guid       VARCHAR(32) NOT NULL COMMENT 'GUID of the profile.',
-    passphrase VARCHAR(24) NOT NULL COMMENT 'Passphrase of the profile.',
     state_id   INT(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Current state of the profile.',
 
     PRIMARY KEY (id),

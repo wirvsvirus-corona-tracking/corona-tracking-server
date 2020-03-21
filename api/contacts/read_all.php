@@ -9,16 +9,16 @@ include_once '../entities/contact.php';
 
 $database = new Database();
 $connection = $database->getConnection();
-$contact = new Contact($connection);
 
-$statement = $contact->read();
+$contact = new Contact($connection);
+$statement = $contact->readAll();
 $count = $statement->rowCount();
 
 if ($count > 0)
 {
     $contacts = array();
-    $contacts["body"] = array();
     $contacts["count"] = $count;
+    $contacts["body"] = array();
 
     while ($row = $statement->fetch(PDO::FETCH_ASSOC))
     {
@@ -45,7 +45,7 @@ else
 
     echo json_encode
     (
-        array("body" => array(), "count" => 0);
+        array("count" => 0, "body" => array());
     );
 }
 ?>

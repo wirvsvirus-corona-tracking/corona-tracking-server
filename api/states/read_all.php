@@ -9,16 +9,16 @@ include_once '../entities/state.php';
 
 $database = new Database();
 $connection = $database->getConnection();
-$state = new State($connection);
 
-$statement = $state->read();
+$state = new State($connection);
+$statement = $state->readAll();
 $count = $statement->rowCount();
 
 if ($count > 0)
 {
     $states = array();
-    $states["body"] = array();
     $states["count"] = $count;
+    $states["body"] = array();
 
     while ($row = $statement->fetch(PDO::FETCH_ASSOC))
     {
@@ -43,7 +43,7 @@ else
 
     echo json_encode
     (
-        array("body" => array(), "count" => 0);
+        array("count" => 0, "body" => array());
     );
 }
 ?>

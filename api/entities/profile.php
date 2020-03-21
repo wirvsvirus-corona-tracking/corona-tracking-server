@@ -4,9 +4,9 @@ class Profile
     // table columns
     public $id;
     public $guid;
-    public $passphrase;
     public $state_id;
 
+    // database connection
     private $connection;
 
     public function __construct($connection)
@@ -16,7 +16,9 @@ class Profile
 
     public function create()
     {
-      $query = "INSERT INTO profile (guid, passphrase) VALUES (" . $this->$guid . ", " . $this->$passphrase . ")";
+      $this->createGuid();
+
+      $query = "INSERT INTO profile (guid) VALUES (" . $this->guid . ")";
       $statement = $this->connection->prepare($query);
 
       $statement->execute();
@@ -24,9 +26,9 @@ class Profile
       return $statement;
     }
 
-    public function read()
+    public function readOne()
     {
-        $query = "SELECT id, guid, passphrase, state_id FROM profile";
+        $query = "SELECT id, guid, state_id FROM profile WHERE id = " . $this->id;
         $statement = $this->connection->prepare($query);
 
         $statement->execute();
@@ -34,14 +36,9 @@ class Profile
         return $statement;
     }
 
-    public function read_one()
+    public function readAll()
     {
-        if (!checkPassphrase())
-        {
-            return;
-        }
-
-        $query = "SELECT id, guid, passphrase, state_id FROM profile WHERE guid = " . $this->$guid;
+        $query = "SELECT id, guid, state_id FROM profile";
         $statement = $this->connection->prepare($query);
 
         $statement->execute();
@@ -51,29 +48,17 @@ class Profile
 
     public function update()
     {
-        if (!checkPassphrase())
-        {
-            return;
-        }
-
-        $query = "UPDATE profile SET state_id = " . $this->$state_id . " WHERE guid = " . $this->$guid;
+        $query = "UPDATE profile SET state_id = " . $this->state_id . " WHERE id = " . $this->id;
         $statement = $this->connection->prepare($query);
 
         $statement->execute();
-
-        updateContacts();
 
         return $statement;
     }
 
     public function delete()
     {
-        if (!checkPassphrase())
-        {
-            return;
-        }
-
-        $query = "DELETE FROM profile WHERE guid = " . $this->$guid;
+        $query = "DELETE FROM profile WHERE id = " . $this->id;
         $statement = $this->connection->prepare($query);
 
         $statement->execute();
@@ -81,42 +66,23 @@ class Profile
         return $statement;
     }
 
-    private function checkPassphrase()
+    public function find()
     {
-        $query = "SELECT passphrase FROM profile WHERE guid = " . $this->$guid;
+        $query = "SELECT id, guid, state_id FROM profile WHERE guid = " . $this->guid;
         $statement = $this->connection->prepare($query);
 
         $statement->execute();
 
-        $count = $statement->rowCount();
-
-        if ($count > 0)
-        {
-            while ($row = $statement->fetch(PDO::FETCH_ASSOC))
-            {
-                extract($row);
-
-                $item = array
-                (
-                      "id" => $id,
-                      "guid" => $guid,
-                      "passphrase" => $passphrase,
-                      "state_id" => $state_id
-                );
-
-                if ($item["passphrase"] == $this->$passphrase)
-                {
-                    return true;
-                }
-            }
-        }
-
-        return false;
+        return $statement;
     }
 
-    private function updateContacts()
+    private createGuid()
     {
-        // TODO: update contacts
+        $uid = uniqid('', true);
+        $random_data = rand(11111, 99999) . $_SERVER['REQUEST_TIME'] . $_SERVER['HTTP_USER_AGENT'] . $_SERVER['REMOTE_ADDR'] . $_SERVER['REMOTE_PORT'];
+        $hash = hash('ripemd128', $uid . md5($random_data));
+
+        $this->guid = strtoupper(substr($hash, 0, 32));
     }
 }
 ?>

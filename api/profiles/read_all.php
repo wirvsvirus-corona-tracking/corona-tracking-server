@@ -9,16 +9,17 @@ include_once '../entities/profile.php';
 
 $database = new Database();
 $connection = $database->getConnection();
+
 $profile = new Profile($connection);
 
-$statement = $profile->read();
+$statement = $profile->readAll();
 $count = $statement->rowCount();
 
 if ($count > 0)
 {
     $profiles = array();
-    $profiles["body"] = array();
     $profiles["count"] = $count;
+    $profiles["body"] = array();
 
     while ($row = $statement->fetch(PDO::FETCH_ASSOC))
     {
@@ -28,14 +29,13 @@ if ($count > 0)
         (
               "id" => $id,
               "guid" => $guid,
-              "passphrase" => $passphrase,
               "state_id" => $state_id
         );
 
-        http_response_code(200);
-
         array_push($profiles["body"], $item);
     }
+
+    http_response_code(200);
 
     echo json_encode($profiles);
 }
@@ -45,7 +45,7 @@ else
 
     echo json_encode
     (
-        array("body" => array(), "count" => 0);
+        array("count" => 0, "body" => array());
     );
 }
 ?>

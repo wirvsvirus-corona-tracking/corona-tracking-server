@@ -10,33 +10,53 @@ include_once '../entities/contact.php';
 
 $data = json_decode(file_get_contents("php://input"));
 
-if (empty($data->guid) || empty($data->passphrase) || empty($data->state_id))
+if (empty($data->guid) || empty($data->state_id))
 {
     echo '{';
-          echo '"status_code": -1';
+    echo '    "status_code": -1';
     echo '}';
 }
 else
 {
     $database = new Database();
     $connection = $database->getConnection();
-    $profile = new Profile($connection);
 
+    $profile = new Profile($connection);
     $profile->$guid = $data->guid;
-    $profile->$passphrase = $data->passphrase;
+
+    $statement = $profile->find();
+    $count = $statement->rowCount();
+
+    if ($count > 0)
+    {
+        while ($row = $statement->fetch(PDO::FETCH_ASSOC))
+        {
+            extract($row);
+
+            $item = array
+            (
+                  "id" => $id,
+                  "guid" => $guid,
+                  "state_id" => $state_id
+            );
+
+            $profile->id = $item["id"];
+        }
+    }
+
     $profile->$state_id = $data->state_id;
 
     if ($profile->update())
     {
         echo '{';
-            echo '"status_code": 0';
+        echo '    "status_code": 0';
         echo '}';
 
-        // TODO: use better solution
-        if ($profile->$state_id == 1)
+        if ($profile->$state_id == 1) // 1 = "infected"
         {
             $contact = new Contact($connection);
-            $statement = $contact->read();
+
+            $statement = $contact->readAll();
             $count = $statement->rowCount();
 
             if ($count > 0)
@@ -57,15 +77,16 @@ else
                     {
                         $furtherProfile = new Profile($connection);
                         $furtherProfile->$id = $item["profile_id_b"];
-                        $furtherProfile->$state_id = 1;
+                        $furtherProfile->$state_id = 1; // 1 = "infected"
 
                         $furtherProfile->update();
                     }
-                    else if ($item["profile_id_b"] == $profile->$id)
+
+                    if ($item["profile_id_b"] == $profile->$id)
                     {
                         $furtherProfile = new Profile($connection);
                         $furtherProfile->$id = $item["profile_id_a"];
-                        $furtherProfile->$state_id = 1;
+                        $furtherProfile->$state_id = 1; // 1 = "infected"
 
                         $furtherProfile->update();
                     }
@@ -76,7 +97,7 @@ else
     else
     {
         echo '{';
-            echo '"status_code": -1';
+        echo '    "status_code": -1';
         echo '}';
     }
 }

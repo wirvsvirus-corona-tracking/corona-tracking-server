@@ -9,30 +9,21 @@ include_once '../entities/profile.php';
 
 $data = json_decode(file_get_contents("php://input"));
 
-if (empty($data->passphrase))
+$database = new Database();
+$connection = $database->getConnection();
+
+$profile = new Profile($connection);
+
+if ($profile->create())
 {
     echo '{';
+    echo '    "guid": "' . $profile->guid . '"';
     echo '}';
 }
 else
 {
-    $database = new Database();
-    $connection = $database->getConnection();
-    $profile = new Profile($connection);
-
-    $profile->$passphrase = $data->passphrase;
-
-    // TODO: get GUID and send it back
-    if ($profile->create())
-    {
-        echo '{';
-            echo '"guid": "<GUID>"';
-        echo '}';
-    }
-    else
-    {
-        echo '{';
-        echo '}';
-    }
+    echo '{';
+    echo '    "guid": ""';
+    echo '}';
 }
 ?>
