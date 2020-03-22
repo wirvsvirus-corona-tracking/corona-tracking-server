@@ -17,8 +17,6 @@ class Database
             // PDO (PHP Data Objects) = lightweight, consistent interface for accessing databases in PHP
             $this->connection = new PDO("mysql:host=" . $this->host . ";port=" . $this->port . ";dbname=" . $this->database, $this->user, $this->password);
             $this->connection->exec("set names utf8");
-
-            echo "Connecting to the database succeeded.";
         }
         catch (PDOException $exception)
         {

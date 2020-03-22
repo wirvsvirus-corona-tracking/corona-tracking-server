@@ -4,7 +4,7 @@ include_once './database.php';
 try
 {
     $database = new Database();
-    $connection = $database.getConnection();
+    $connection = $database->getConnection();
     $setup_script = file_get_contents("data/setup.sql");
 
     $connection->exec($setup_script);
