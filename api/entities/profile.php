@@ -85,7 +85,7 @@ class Profile
         return $statement;
     }
 
-    private createGuid()
+    private function createGuid()
     {
         $uid = uniqid('', true);
         $random_data = rand(11111, 99999) . $_SERVER['REQUEST_TIME'] . $_SERVER['HTTP_USER_AGENT'] . $_SERVER['REMOTE_ADDR'] . $_SERVER['REMOTE_PORT'];
