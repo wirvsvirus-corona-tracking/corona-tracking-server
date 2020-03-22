@@ -19,7 +19,7 @@ class Profile
       $this->createGuid();
 
       $query = "INSERT INTO profile (guid)
-                VALUES (" . $this->guid . ")";
+                VALUES ('" . $this->guid . "')";
 
       $statement = $this->connection->prepare($query);
       $statement->execute();
@@ -77,7 +77,7 @@ class Profile
     {
         $query = "SELECT id, guid, state_id
                   FROM profile
-                  WHERE guid = " . $this->guid;
+                  WHERE guid = '" . $this->guid . "'";
 
         $statement = $this->connection->prepare($query);
         $statement->execute();

@@ -40,7 +40,7 @@ class State
     {
         $query = "SELECT id, name
                   FROM state
-                  WHERE name = " . $this->name;
+                  WHERE name = '" . $this->name . "'";
 
         $statement = $this->connection->prepare($query);
         $statement->execute();

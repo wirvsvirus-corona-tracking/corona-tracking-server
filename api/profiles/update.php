@@ -1,6 +1,6 @@
 <?
 header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Allow-Methods: PUT");
+//header("Access-Control-Allow-Methods: PUT");
 header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
@@ -8,19 +8,20 @@ include_once '../config/database.php';
 include_once '../entities/profile.php';
 include_once '../entities/contact.php';
 
-$data = json_decode(file_get_contents("php://input"));
+$guid_input = $_GET["guid"];
+$state_id_input = (int)$_GET["state_id"];
 
 $output = array();
 $output["status_code"] = -1; // -1 = error
 
-if (!empty($data->guid) &&
-    !empty($data->state_id))
+if (!empty($guid_input) &&
+    !empty($state_id_input))
 {
     $database = new Database();
     $connection = $database->getConnection();
 
     $profile = new Profile($connection);
-    $profile->$guid = $data->guid;
+    $profile->guid = $guid_input;
 
     $statement = $profile->find();
     $count = $statement->rowCount();
@@ -42,13 +43,13 @@ if (!empty($data->guid) &&
         }
     }
 
-    $profile->$state_id = $data->state_id;
+    $profile->state_id = $state_id_input;
 
     if ($profile->update())
     {
         $output["status_code"] = 0; // 0 = no error
 
-        if ($profile->$state_id == 1) // 1 = infected
+        if ($profile->state_id == 2) // 2 = infected
         {
             // the current profile was infected therefore update all profiles that had contact with the current profile
 
@@ -71,20 +72,20 @@ if (!empty($data->guid) &&
                         "profile_id_b" => $profile_id_b
                     );
 
-                    if ($item["profile_id_a"] == $profile->$id)
+                    if ($item["profile_id_a"] == $profile->id)
                     {
                         $furtherProfile = new Profile($connection);
-                        $furtherProfile->$id = $item["profile_id_b"];
-                        $furtherProfile->$state_id = 1; // 1 = infected
+                        $furtherProfile->id = $item["profile_id_b"];
+                        $furtherProfile->state_id = 2; // 2 = infected
 
                         $furtherProfile->update();
                     }
 
-                    if ($item["profile_id_b"] == $profile->$id)
+                    if ($item["profile_id_b"] == $profile->id)
                     {
                         $furtherProfile = new Profile($connection);
-                        $furtherProfile->$id = $item["profile_id_a"];
-                        $furtherProfile->$state_id = 1; // 1 = infected
+                        $furtherProfile->id = $item["profile_id_a"];
+                        $furtherProfile->state_id = 2; // 2 = infected
 
                         $furtherProfile->update();
                     }

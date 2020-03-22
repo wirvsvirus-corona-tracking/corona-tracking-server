@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS profile
 (
     id         INT(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID of the profile.',
     guid       VARCHAR(32) NOT NULL COMMENT 'GUID of the profile.',
-    state_id   INT(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Current state of the profile.',
+    state_id   INT(11) UNSIGNED NOT NULL DEFAULT 1 COMMENT 'Current state of the profile.',
 
     PRIMARY KEY (id),
     FOREIGN KEY (state_id) REFERENCES state (id) ON DELETE CASCADE,

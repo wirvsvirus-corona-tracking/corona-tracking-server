@@ -1,6 +1,6 @@
 <?
 header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Allow-Methods: POST");
+//header("Access-Control-Allow-Methods: POST");
 header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
@@ -8,13 +8,14 @@ include_once '../config/database.php';
 include_once '../entities/contact.php';
 include_once '../entities/profile.php';
 
-$data = json_decode(file_get_contents("php://input"));
+$profile_guid_a_input = $_GET["profile_guid_a"];
+$profile_guid_b_input = $_GET["profile_guid_b"];
 
 $output = array();
 $output["status_code"] = -1; // -1 = error
 
-if (!empty($data->profile_guid_a) &&
-    !empty($data->profile_guid_b))
+if (!empty($profile_guid_a_input) &&
+    !empty($profile_guid_b_input))
 {
     $database = new Database();
     $connection = $database->getConnection();
@@ -24,7 +25,7 @@ if (!empty($data->profile_guid_a) &&
     // search for profile ID of profile A
 
     $profile_a = new Profile($connection);
-    $profile_a->guid = $data->profile_guid_a;
+    $profile_a->guid = $profile_guid_a_input;
 
     $statement = $profile_a->find();
     $count = $statement->rowCount();
@@ -49,7 +50,7 @@ if (!empty($data->profile_guid_a) &&
     // search for profile ID of profile B
 
     $profile_b = new Profile($connection);
-    $profile_b->guid = $data->profile_guid_b;
+    $profile_b->guid = $profile_guid_b_input;
 
     $statement = $profile_b->find();
     $count = $statement->rowCount();

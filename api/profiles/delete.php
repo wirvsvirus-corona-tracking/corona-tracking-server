@@ -1,24 +1,24 @@
 <?
 header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Allow-Methods: DELETE");
+//header("Access-Control-Allow-Methods: DELETE");
 header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
 include_once '../config/database.php';
 include_once '../entities/profile.php';
 
-$data = json_decode(file_get_contents("php://input"));
+$guid_input = $_GET["guid"];
 
 $output = array();
 $output["status_code"] = -1; // -1 = error
 
-if (!empty($data->guid))
+if (!empty($guid_input))
 {
     $database = new Database();
     $connection = $database->getConnection();
 
     $profile = new Profile($connection);
-    $profile->$guid = $data->guid;
+    $profile->guid = $guid_input;
 
     $statement = $profile->find();
     $count = $statement->rowCount();
