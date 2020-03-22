@@ -9,13 +9,13 @@
         * profile.php: contains properties and methods for "profile" database queries
         * contact.php: contains properties and methods for "contact" database queries
     * states/
-        * read.php: file that will output JSON data based on "states" database records
+        * read_all.php: file that will output JSON data based on "states" database records
     * profiles/
         * create.php: file that will accept posted "profile" data to be saved to the database
-        * read.php: file that will output JSON data based on "profile" database records
+        * read_all.php: file that will output JSON data based on "profile" database records
         * read_one.php: file that will accept an ID to output JSON data based on a "profile" record from the database
         * update.php: file that will accept an ID to update a "profile" record from the database
         * delete.php: file that will accept an ID to delete a "profile" record from the database
     * contacts/
         * create.php: file that will accept posted "contact" data to be saved to the database
-        * read.php: file that will output JSON data based on "contact" database records
+        * read_all.php: file that will output JSON data based on "contact" database records

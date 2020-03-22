@@ -15,11 +15,13 @@ $profile = new Profile($connection);
 $statement = $profile->readAll();
 $count = $statement->rowCount();
 
+$output = array();
+$output["count"] = 0;
+$output["body"] = array();
+
 if ($count > 0)
 {
-    $profiles = array();
-    $profiles["count"] = $count;
-    $profiles["body"] = array();
+    $output["count"] = $count;
 
     while ($row = $statement->fetch(PDO::FETCH_ASSOC))
     {
@@ -27,25 +29,15 @@ if ($count > 0)
 
         $item = array
         (
-              "id" => $id,
-              "guid" => $guid,
-              "state_id" => $state_id
+            "id" => $id,
+            "guid" => $guid,
+            "state_id" => $state_id
         );
 
-        array_push($profiles["body"], $item);
+        array_push($output["body"], $item);
     }
-
-    http_response_code(200);
-
-    echo json_encode($profiles);
 }
-else
-{
-    http_response_code(200);
 
-    echo json_encode
-    (
-        array("count" => 0, "body" => array());
-    );
-}
+http_response_code(200);
+echo json_encode($output);
 ?>

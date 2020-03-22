@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS profile
 CREATE TABLE IF NOT EXISTS contact
 (
     id           INT(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID of the contact.',
-    timestamp    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Timestamp of the contact.',
+    last_contact TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Timestamp of the last contact.',
     profile_id_a INT(11) UNSIGNED NOT NULL COMMENT 'Profile As profile ID of the contact.',
     profile_id_b INT(11) UNSIGNED NOT NULL COMMENT 'Profile Bs profile ID of the contact.',
 

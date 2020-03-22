@@ -14,16 +14,14 @@ $connection = $database->getConnection();
 
 $profile = new Profile($connection);
 
+$output = array();
+$output["guid"] = '""';
+
 if ($profile->create())
 {
-    echo '{';
-    echo '    "guid": "' . $profile->guid . '"';
-    echo '}';
+    $output["guid"] = '"' . $profile->guid . '"';
 }
-else
-{
-    echo '{';
-    echo '    "guid": ""';
-    echo '}';
-}
+
+http_response_code(200);
+echo json_encode($output);
 ?>

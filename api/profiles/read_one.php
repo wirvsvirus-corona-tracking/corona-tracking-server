@@ -9,16 +9,11 @@ include_once '../entities/profile.php';
 
 $data = json_decode(file_get_contents("php://input"));
 
-if (empty($data->guid))
-{
-    http_response_code(200);
+$output = array();
+$output["count"] = 0;
+$output["body"] = array();
 
-    echo json_encode
-    (
-        array("count" => 0, "body" => array());
-    );
-}
-else
+if (!empty($data->guid))
 {
     $database = new Database();
     $connection = $database->getConnection();
@@ -31,9 +26,7 @@ else
 
     if ($count > 0)
     {
-        $profiles = array();
-        $profiles["count"] = $count;
-        $profiles["body"] = array();
+        $output["count"] = $count;
 
         while ($row = $statement->fetch(PDO::FETCH_ASSOC))
         {
@@ -41,26 +34,16 @@ else
 
             $item = array
             (
-                  "id" => $id,
-                  "guid" => $guid,
-                  "state_id" => $state_id
+                "id" => $id,
+                "guid" => $guid,
+                "state_id" => $state_id
             );
 
-            array_push($profiles["body"], $item);
+            array_push($output["body"], $item);
         }
-
-        http_response_code(200);
-
-        echo json_encode($profiles);
-    }
-    else
-    {
-        http_response_code(200);
-
-        echo json_encode
-        (
-            array("count" => 0, "body" => array());
-        );
     }
 }
+
+http_response_code(200);
+echo json_encode($output);
 ?>

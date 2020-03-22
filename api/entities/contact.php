@@ -3,7 +3,7 @@ class Contact
 {
     // table columns
     public $id;
-    public $timestamp;
+    public $last_contact;
     public $profile_id_a;
     public $profile_id_b;
 
@@ -17,9 +17,10 @@ class Contact
 
     public function create()
     {
-      $query = "INSERT INTO contact (profile_id_a, profile_id_b) VALUES (" . $this->profile_id_a . ", " . $this->profile_id_b . ")";
-      $statement = $this->connection->prepare($query);
+      $query = "INSERT INTO contact (profile_id_a, profile_id_b)
+                VALUES (" . $this->profile_id_a . ", " . $this->profile_id_b . ")";
 
+      $statement = $this->connection->prepare($query);
       $statement->execute();
 
       return $statement;
@@ -27,9 +28,11 @@ class Contact
 
     public function readOne()
     {
-        $query = "SELECT id, timestamp, profile_id_a, profile_id_b FROM contact WHERE id = " . $this->id;
-        $statement = $this->connection->prepare($query);
+        $query = "SELECT id, last_contact, profile_id_a, profile_id_b
+                  FROM contact
+                  WHERE id = " . $this->id;
 
+        $statement = $this->connection->prepare($query);
         $statement->execute();
 
         return $statement;
@@ -37,9 +40,22 @@ class Contact
 
     public function readAll()
     {
-        $query = "SELECT id, timestamp, profile_id_a, profile_id_b FROM contact";
-        $statement = $this->connection->prepare($query);
+        $query = "SELECT id, last_contact, profile_id_a, profile_id_b
+                  FROM contact";
 
+        $statement = $this->connection->prepare($query);
+        $statement->execute();
+
+        return $statement;
+    }
+
+    public function update()
+    {
+        $query = "UPDATE contact
+                  SET last_contact = CURRENT_TIMESTAMP
+                  WHERE id = " . $this->id;
+
+        $statement = $this->connection->prepare($query);
         $statement->execute();
 
         return $statement;
@@ -47,9 +63,11 @@ class Contact
 
     public function find()
     {
-        $query = "SELECT id, timestamp, profile_id_a, profile_id_b FROM contact WHERE profile_id_a IN (" . $this->profile_id_a . ", " . $this->profile_id_b . ") OR profile_id_b IN (" . $this->profile_id_a . ", " . $this->profile_id_b . ")";
-        $statement = $this->connection->prepare($query);
+        $query = "SELECT id, last_contact, profile_id_a, profile_id_b
+                  FROM contact
+                  WHERE profile_id_a = " . $this->profile_id_a . " AND profile_id_b = " . $this->profile_id_b . " OR profile_id_a = " . $this->profile_id_b . " AND profile_id_b = " . $this->profile_id_a;
 
+        $statement = $this->connection->prepare($query);
         $statement->execute();
 
         return $statement;

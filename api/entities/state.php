@@ -15,9 +15,11 @@ class State
 
     public function readOne()
     {
-        $query = "SELECT id, name FROM state WHERE id = " . $this->id;
-        $statement = $this->connection->prepare($query);
+        $query = "SELECT id, name
+                  FROM state
+                  WHERE id = " . $this->id;
 
+        $statement = $this->connection->prepare($query);
         $statement->execute();
 
         return $statement;
@@ -25,9 +27,10 @@ class State
 
     public function readAll()
     {
-        $query = "SELECT id, name FROM state";
-        $statement = $this->connection->prepare($query);
+        $query = "SELECT id, name
+                  FROM state";
 
+        $statement = $this->connection->prepare($query);
         $statement->execute();
 
         return $statement;
@@ -35,9 +38,11 @@ class State
 
     public function find()
     {
-        $query = "SELECT id, name FROM state WHERE name = " . $this->name;
-        $statement = $this->connection->prepare($query);
+        $query = "SELECT id, name
+                  FROM state
+                  WHERE name = " . $this->name;
 
+        $statement = $this->connection->prepare($query);
         $statement->execute();
 
         return $statement;

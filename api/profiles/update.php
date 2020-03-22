@@ -10,13 +10,11 @@ include_once '../entities/contact.php';
 
 $data = json_decode(file_get_contents("php://input"));
 
-if (empty($data->guid) || empty($data->state_id))
-{
-    echo '{';
-    echo '    "status_code": -1';
-    echo '}';
-}
-else
+$output = array();
+$output["status_code"] = -1; // -1 = error
+
+if (!empty($data->guid) &&
+    !empty($data->state_id))
 {
     $database = new Database();
     $connection = $database->getConnection();
@@ -35,9 +33,9 @@ else
 
             $item = array
             (
-                  "id" => $id,
-                  "guid" => $guid,
-                  "state_id" => $state_id
+                "id" => $id,
+                "guid" => $guid,
+                "state_id" => $state_id
             );
 
             $profile->id = $item["id"];
@@ -48,12 +46,12 @@ else
 
     if ($profile->update())
     {
-        echo '{';
-        echo '    "status_code": 0';
-        echo '}';
+        $output["status_code"] = 0; // 0 = no error
 
-        if ($profile->$state_id == 1) // 1 = "infected"
+        if ($profile->$state_id == 1) // 1 = infected
         {
+            // the current profile was infected therefore update all profiles that had contact with the current profile
+
             $contact = new Contact($connection);
 
             $statement = $contact->readAll();
@@ -67,17 +65,17 @@ else
 
                     $item = array
                     (
-                          "id" => $id,
-                          "timestamp" => $timestamp,
-                          "profile_id_a" => $profile_id_a,
-                          "profile_id_b" => $profile_id_b
+                        "id" => $id,
+                        "last_contact" => $last_contact,
+                        "profile_id_a" => $profile_id_a,
+                        "profile_id_b" => $profile_id_b
                     );
 
                     if ($item["profile_id_a"] == $profile->$id)
                     {
                         $furtherProfile = new Profile($connection);
                         $furtherProfile->$id = $item["profile_id_b"];
-                        $furtherProfile->$state_id = 1; // 1 = "infected"
+                        $furtherProfile->$state_id = 1; // 1 = infected
 
                         $furtherProfile->update();
                     }
@@ -86,7 +84,7 @@ else
                     {
                         $furtherProfile = new Profile($connection);
                         $furtherProfile->$id = $item["profile_id_a"];
-                        $furtherProfile->$state_id = 1; // 1 = "infected"
+                        $furtherProfile->$state_id = 1; // 1 = infected
 
                         $furtherProfile->update();
                     }
@@ -94,11 +92,8 @@ else
             }
         }
     }
-    else
-    {
-        echo '{';
-        echo '    "status_code": -1';
-        echo '}';
-    }
 }
+
+http_response_code(200);
+echo json_encode($output);
 ?>

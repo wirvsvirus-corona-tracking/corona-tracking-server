@@ -11,14 +11,17 @@ $database = new Database();
 $connection = $database->getConnection();
 
 $contact = new Contact($connection);
+
 $statement = $contact->readAll();
 $count = $statement->rowCount();
 
+$output = array();
+$output["count"] = 0;
+$output["body"] = array();
+
 if ($count > 0)
 {
-    $contacts = array();
-    $contacts["count"] = $count;
-    $contacts["body"] = array();
+    $output["count"] = $count;
 
     while ($row = $statement->fetch(PDO::FETCH_ASSOC))
     {
@@ -26,26 +29,16 @@ if ($count > 0)
 
         $item = array
         (
-              "id" => $id,
-              "timestamp" => $timestamp,
-              "profile_id_a" => $profile_id_a,
-              "profile_id_b" => $profile_id_b
+            "id" => $id,
+            "last_contact" => $last_contact,
+            "profile_id_a" => $profile_id_a,
+            "profile_id_b" => $profile_id_b
         );
 
-        array_push($contacts["body"], $item);
+        array_push($output["body"], $item);
     }
-
-    http_response_code(200);
-
-    echo json_encode($contacts);
 }
-else
-{
-    http_response_code(200);
 
-    echo json_encode
-    (
-        array("count" => 0, "body" => array());
-    );
-}
+http_response_code(200);
+echo json_encode($output);
 ?>
