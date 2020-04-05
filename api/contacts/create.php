@@ -5,10 +5,12 @@ header("Access-Control-Max-Age: 3600"); // indicates how long (in seconds) the r
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With"); // indicates which HTTP headers can be used during the actual request
 
 include_once "../config/database.php";
-include_once "../controllers/contact_controller.php";
-include_once "../controllers/profile_controller.php";
+include_once "../entities/contact_controller.php";
+include_once "../entities/profile_controller.php";
 include_once "../entities/contact.php";
 include_once "../entities/profile.php";
+
+$httpResponseCode = 200;
 
 $output = array();
 $output["status_code"] = -1; // -1 = error
@@ -50,11 +52,11 @@ try
         $contactController = new ContactController($connection);
         $contacts = $contactController->findByProfilePair($profileIdA, $profileIdB);
 
-        if (count($contacts) == 0) // contact does not exist yet therefore create a new contact
+        if (count($contacts) == 0) // contact does not exist yet therefore create a new one
         {
             $contactController->create($profileIdA, $profileIdB);
         }
-        else // contact already exists therefore just update the contact
+        else // contact already exists therefore just update it
         {
             foreach ($contacts as $contact)
             {
@@ -67,8 +69,9 @@ try
 }
 catch (Exception $exception)
 {
+    $httpResponseCode = 500;
 }
 
-http_response_code(200);
+http_response_code($httpResponseCode);
 echo json_encode($output);
 ?>

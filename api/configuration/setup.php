@@ -1,6 +1,8 @@
 <?php
 include_once "database.php";
 
+$httpResponseCode = 200;
+
 $output = array();
 $output["message"] = "Setting up the tables failed.";
 
@@ -18,11 +20,13 @@ try
 
     $output["message"] = "Setting up the tables succeeded.";
 }
-catch(PDOException $exception)
+catch (Exception $exception)
 {
+    $httpResponseCode = 500;
+
     $output["message"] = "Setting up the tables failed with the following error message: '" . $$exception->getMessage() . "'.";
 }
 
-http_response_code(200);
+http_response_code($httpResponseCode);
 echo json_encode($output);
 ?>

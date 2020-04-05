@@ -1,4 +1,6 @@
 <?php
+include_once "state.php";
+
 class StateController
 {
     public function __construct($connection)
@@ -8,8 +10,6 @@ class StateController
 
     public function read($id)
     {
-        $profiles = array();
-
         $query = "SELECT id, name
                   FROM state
                   WHERE id = " . $id;

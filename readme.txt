@@ -1,8 +1,8 @@
 * api/
     * configuration/
+        * database.php: file used for connecting to the database
         * setup.php: file used for setting up the database
         * cleanup.php: file used for cleaning up the database
-        * database.php: file used for connecting to the database
         * data/
             * database_credentials.php: contains a PHP array with the database credentials
             * database_setup.sql: contains SQL statements for the database setup
@@ -11,7 +11,6 @@
         * state.php: contains the "state" properties
         * profile.php: contains the "profile" properties
         * contact.php: contains the "contact" properties
-    * controllers/
         * state_controller.php: contains the methods for the "state" related database queries
         * profile_controller.php: contains the methods for the "profile" related database queries
         * contact_controller.php: contains the methods for the "contact" related database queries

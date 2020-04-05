@@ -1,4 +1,6 @@
 <?php
+include_once "profile.php";
+
 class ProfileController
 {
     public function __construct($connection)
@@ -99,7 +101,7 @@ class ProfileController
 
     private static function createGuid()
     {
-        $randomData = $_SERVER["HTTP_USER_AGENT"] . $_SERVER["REQUEST_TIME"] . bin2hex(openssl_random_pseudo_bytes(16)); // 16 bytes
+        $randomData = $_SERVER["HTTP_USER_AGENT"] . $_SERVER["REQUEST_TIME"] . bin2hex(openssl_random_pseudo_bytes(16));
         $hash = md5($randomData);
         $guid = strtoupper(substr($hash, 0, 32));
 

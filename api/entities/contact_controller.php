@@ -1,4 +1,6 @@
 <?php
+include_once "contact.php";
+
 class ContactController
 {
     public function __construct($connection)
