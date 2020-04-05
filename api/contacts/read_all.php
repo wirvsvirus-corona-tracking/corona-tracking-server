@@ -1,42 +1,42 @@
-<?
-header("Content-Type: application/json; charset=UTF-8");
-//header("Access-Control-Allow-Methods: GET");
-header("Access-Control-Max-Age: 3600");
-header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
+<?php
+header("Content-Type: application/json; charset=UTF-8"); // tells the client what the content type of the returned content actually is
+header("Access-Control-Allow-Methods: GET"); // specifies the method or methods allowed when accessing the resource in response to a preflight request
+header("Access-Control-Max-Age: 3600"); // indicates how long (in seconds) the results of a preflight request can be cached
+header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With"); // indicates which HTTP headers can be used during the actual request
 
-include_once '../config/database.php';
-include_once '../entities/contact.php';
-
-$database = new Database();
-$connection = $database->getConnection();
-
-$contact = new Contact($connection);
-
-$statement = $contact->readAll();
-$count = $statement->rowCount();
+include_once "../config/database.php";
+include_once "../controllers/contact_controller.php";
+include_once "../entities/contact.php";
 
 $output = array();
 $output["count"] = 0;
 $output["body"] = array();
 
-if ($count > 0)
+try
 {
-    $output["count"] = $count;
+    $database = new Database();
+    $connection = $database->getConnection();
 
-    while ($row = $statement->fetch(PDO::FETCH_ASSOC))
+    $contactController = new ContactController($connection);
+    $contacts = $contactController->readAll();
+
+    foreach ($contacts as $contact)
     {
-        extract($row);
+        ++$output["count"];
 
         $item = array
         (
-            "id" => $id,
-            "last_contact" => $last_contact,
-            "profile_id_a" => $profile_id_a,
-            "profile_id_b" => $profile_id_b
+            "id" => $contact->id,
+            "last_contact" => $contact->lastContact,
+            "profile_guid_a" => $contact->profileIdA,
+            "profile_guid_b" => $contact->profileIdB
         );
 
         array_push($output["body"], $item);
     }
+}
+catch (Exception $exception)
+{
 }
 
 http_response_code(200);

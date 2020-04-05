@@ -1,3 +1,7 @@
+/**********************************
+ * Create all the required tables *
+ **********************************/
+
 CREATE TABLE IF NOT EXISTS state
 (
     id   INT(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID of the state.',
@@ -31,4 +35,10 @@ CREATE TABLE IF NOT EXISTS contact
     UNIQUE KEY unique_contact (profile_id_a, profile_id_b)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='All the contacts between two profiles.';
 
-INSERT INTO state (name) VALUES ('not infected'), ('infected');
+
+
+/********************************
+ * Insert all the required data *
+ ********************************/
+
+INSERT INTO state (name) VALUES ('not infected'), ('maybe infected'), ('infected');

@@ -1,98 +1,71 @@
-<?
-header("Content-Type: application/json; charset=UTF-8");
-//header("Access-Control-Allow-Methods: PUT");
-header("Access-Control-Max-Age: 3600");
-header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
+<?php
+header("Content-Type: application/json; charset=UTF-8"); // tells the client what the content type of the returned content actually is
+header("Access-Control-Allow-Methods: PUT"); // specifies the method or methods allowed when accessing the resource in response to a preflight request
+header("Access-Control-Max-Age: 3600"); // indicates how long (in seconds) the results of a preflight request can be cached
+header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With"); // indicates which HTTP headers can be used during the actual request
 
-include_once '../config/database.php';
-include_once '../entities/profile.php';
-include_once '../entities/contact.php';
-
-$guid_input = $_GET["guid"];
-$state_id_input = (int)$_GET["state_id"];
+include_once "../config/database.php";
+include_once "../controllers/profile_controller.php";
+include_once "../controllers/contact_controller.php";
+include_once "../entities/profile.php";
+include_once "../entities/contact.php";
 
 $output = array();
 $output["status_code"] = -1; // -1 = error
 
-if (!empty($guid_input) &&
-    !empty($state_id_input))
+try
 {
-    $database = new Database();
-    $connection = $database->getConnection();
+    $guid = $_GET["guid"];
+    $stateId = (int)$_GET["state_id"];
 
-    $profile = new Profile($connection);
-    $profile->guid = $guid_input;
-
-    $statement = $profile->find();
-    $count = $statement->rowCount();
-
-    if ($count > 0)
+    if (isset($guid) && isset($stateId) && !empty($guid))
     {
-        while ($row = $statement->fetch(PDO::FETCH_ASSOC))
+        $database = new Database();
+        $connection = $database->getConnection();
+
+        $profileController = new ProfileController($connection);
+        $profiles = $profileController->find($guid);
+
+        foreach ($profiles as $profile)
         {
-            extract($row);
+            $profileController->update($profile->id, $stateId);
 
-            $item = array
-            (
-                "id" => $id,
-                "guid" => $guid,
-                "state_id" => $state_id
-            );
-
-            $profile->id = $item["id"];
-        }
-    }
-
-    $profile->state_id = $state_id_input;
-
-    if ($profile->update())
-    {
-        $output["status_code"] = 0; // 0 = no error
-
-        if ($profile->state_id == 2) // 2 = infected
-        {
-            // the current profile was infected therefore update all profiles that had contact with the current profile
-
-            $contact = new Contact($connection);
-
-            $statement = $contact->readAll();
-            $count = $statement->rowCount();
-
-            if ($count > 0)
+            if ($stateId == 3) // 3 = infected
             {
-                while ($row = $statement->fetch(PDO::FETCH_ASSOC))
+                // the current profile was infected therefore update all profiles that had contact with the current profile
+
+                $contactController = new ContactController($connection);
+                $contacts = $contactController->findByProfile($profile->id);
+
+                $otherProfiles = array();
+
+                foreach ($contacts as $contact)
                 {
-                    extract($row);
-
-                    $item = array
-                    (
-                        "id" => $id,
-                        "last_contact" => $last_contact,
-                        "profile_id_a" => $profile_id_a,
-                        "profile_id_b" => $profile_id_b
-                    );
-
-                    if ($item["profile_id_a"] == $profile->id)
+                    if ($profile->id == $contact->profileIdA)
                     {
-                        $furtherProfile = new Profile($connection);
-                        $furtherProfile->id = $item["profile_id_b"];
-                        $furtherProfile->state_id = 2; // 2 = infected
-
-                        $furtherProfile->update();
+                        array_push($otherProfiles, $profileController->read($contact->profileIdB));
                     }
-
-                    if ($item["profile_id_b"] == $profile->id)
+                    else
                     {
-                        $furtherProfile = new Profile($connection);
-                        $furtherProfile->id = $item["profile_id_a"];
-                        $furtherProfile->state_id = 2; // 2 = infected
+                        array_push($otherProfiles, $profileController->read($contact->profileIdA));
+                    }
+                }
 
-                        $furtherProfile->update();
+                foreach ($otherProfiles as $otherProfile)
+                {
+                    if ($otherProfile->stateId == 1)  // 1 = not infected
+                    {
+                        $profileController->update($otherProfile->id, 2); // 2 = maybe infected
                     }
                 }
             }
         }
+
+        $output["status_code"] = 0; // 0 = no error
     }
+}
+catch (Exception $exception)
+{
 }
 
 http_response_code(200);

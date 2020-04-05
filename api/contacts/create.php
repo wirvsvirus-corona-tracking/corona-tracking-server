@@ -1,111 +1,72 @@
-<?
-header("Content-Type: application/json; charset=UTF-8");
-//header("Access-Control-Allow-Methods: POST");
-header("Access-Control-Max-Age: 3600");
-header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
+<?php
+header("Content-Type: application/json; charset=UTF-8"); // tells the client what the content type of the returned content actually is
+header("Access-Control-Allow-Methods: POST"); // specifies the method or methods allowed when accessing the resource in response to a preflight request
+header("Access-Control-Max-Age: 3600"); // indicates how long (in seconds) the results of a preflight request can be cached
+header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With"); // indicates which HTTP headers can be used during the actual request
 
-include_once '../config/database.php';
-include_once '../entities/contact.php';
-include_once '../entities/profile.php';
-
-$profile_guid_a_input = $_GET["profile_guid_a"];
-$profile_guid_b_input = $_GET["profile_guid_b"];
+include_once "../config/database.php";
+include_once "../controllers/contact_controller.php";
+include_once "../controllers/profile_controller.php";
+include_once "../entities/contact.php";
+include_once "../entities/profile.php";
 
 $output = array();
 $output["status_code"] = -1; // -1 = error
 
-if (!empty($profile_guid_a_input) &&
-    !empty($profile_guid_b_input))
+try
 {
-    $database = new Database();
-    $connection = $database->getConnection();
+    $profileGuidA = $_GET["profile_guid_a"];
+    $profileGuidB = $_GET["profile_guid_b"];
 
-    $contact = new Contact($connection);
-
-    // search for profile ID of profile A
-
-    $profile_a = new Profile($connection);
-    $profile_a->guid = $profile_guid_a_input;
-
-    $statement = $profile_a->find();
-    $count = $statement->rowCount();
-
-    if ($count > 0)
+    if (isset($profileGuidA) && isset($profileGuidB) && !empty($profileGuidA) && !empty($profileGuidB))
     {
-        while ($row = $statement->fetch(PDO::FETCH_ASSOC))
+        $database = new Database();
+        $connection = $database->getConnection();
+
+        $profileController = new ProfileController($connection);
+
+        // search for profile ID of profile A
+
+        $profiles = $profileController->find($profileGuidA);
+        $profileIdA = -1;
+
+        foreach ($profiles as $profile)
         {
-            extract($row);
-
-            $item = array
-            (
-                "id" => $id,
-                "guid" => $guid,
-                "state_id" => $state_id
-            );
-
-            $contact->profile_id_a = $item["id"];
+            $profileIdA = $profile->id;
         }
+
+        // search for profile ID of profile B
+
+        $profiles = $profileController->find($profileGuidB);
+        $profileIdB = -1;
+
+        foreach ($profiles as $profile)
+        {
+            $profileIdB = $profile->id;
+        }
+
+        // actual creation (or update) of the contact
+
+        $contactController = new ContactController($connection);
+        $contacts = $contactController->findByProfilePair($profileIdA, $profileIdB);
+
+        if (count($contacts) == 0) // contact does not exist yet therefore create a new contact
+        {
+            $contactController->create($profileIdA, $profileIdB);
+        }
+        else // contact already exists therefore just update the contact
+        {
+            foreach ($contacts as $contact)
+            {
+                $contactController->update($contact->id);
+            }
+        }
+
+        $output["status_code"] = 0; // 0 = no error
     }
-
-    // search for profile ID of profile B
-
-    $profile_b = new Profile($connection);
-    $profile_b->guid = $profile_guid_b_input;
-
-    $statement = $profile_b->find();
-    $count = $statement->rowCount();
-
-    if ($count > 0)
-    {
-        while ($row = $statement->fetch(PDO::FETCH_ASSOC))
-        {
-            extract($row);
-
-            $item = array
-            (
-                "id" => $id,
-                "guid" => $guid,
-                "state_id" => $state_id
-            );
-
-            $contact->profile_id_b = $item["id"];
-        }
-    }
-
-    // actual creation (or update) of the contact
-
-    $statement = $contact->find();
-    $count = $statement->rowCount();
-
-    if ($count > 0) // contact already exists therefore just update the contact
-    {
-        while ($row = $statement->fetch(PDO::FETCH_ASSOC))
-        {
-            extract($row);
-
-            $item = array
-            (
-                "id" => $id,
-                "last_contact" => $last_contact,
-                "profile_id_a" => $profile_id_a,
-                "profile_id_b" => $profile_id_b
-            );
-
-            $contact->id = $item["id"];
-        }
-
-        if ($contact->update())
-        {
-            $output["status_code"] = 0; // 0 = no error
-        }
-    }
-    else // contact does not exist yet therefore create a new contact
-    {
-        if ($contact->create())
-        {
-            $output["status_code"] = 0; // 0 = no error
-        }
-    }
+}
+catch (Exception $exception)
+{
 }
 
 http_response_code(200);

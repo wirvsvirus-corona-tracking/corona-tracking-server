@@ -1,0 +1,49 @@
+RewriteEngine On
+
+##########
+# States #
+##########
+
+# read all states
+RewriteCond %{REQUEST_METHOD} =GET
+RewriteRule ^states$ states/readAll.php
+
+
+
+############
+# Profiles #
+############
+
+# create a profile
+RewriteCond %{REQUEST_METHOD} =POST
+RewriteRule ^profiles$ profiles/create.php
+
+# read a profile
+RewriteCond %{REQUEST_METHOD} =GET
+RewriteRule ^profiles/([A-Z0-9]{32}) profiles/read.php?guid=$1
+
+# read all profiles
+RewriteCond %{REQUEST_METHOD} =GET
+RewriteRule ^profiles$ profiles/readAll.php
+
+# update a profile
+RewriteCond %{REQUEST_METHOD} =PUT
+RewriteRule ^profiles/([A-Z0-9]{32})/([1-2]) profiles/update.php?guid=$1&state_id=$2
+
+# delete a profile
+RewriteCond %{REQUEST_METHOD} =DELETE
+RewriteRule ^profiles/([A-Z0-9]{32}) profiles/delete.php?guid=$1
+
+
+
+############
+# Contacts #
+############
+
+# create a contact
+RewriteCond %{REQUEST_METHOD} =POST
+RewriteRule ^contacts/([A-Z0-9]{32})/([A-Z0-9]{32}) contacts/create.php?profile_guid_a=$1&profile_guid_b=$2
+
+# read all contacts
+RewriteCond %{REQUEST_METHOD} =GET
+RewriteRule ^contacts$ contacts/readAll.php
