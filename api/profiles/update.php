@@ -4,7 +4,7 @@ header("Access-Control-Allow-Methods: PUT"); // specifies the method or methods 
 header("Access-Control-Max-Age: 3600"); // indicates how long (in seconds) the results of a preflight request can be cached
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With"); // indicates which HTTP headers can be used during the actual request
 
-include_once "../config/database.php";
+include_once "../configuration/database.php";
 include_once "../entities/profile_controller.php";
 include_once "../entities/contact_controller.php";
 include_once "../entities/profile.php";
@@ -45,11 +45,11 @@ try
                 {
                     if ($profile->id == $contact->profileIdA)
                     {
-                        array_push($otherProfiles, $profileController->read($contact->profileIdB));
+                        $otherProfiles = array_merge($otherProfiles, $profileController->read($contact->profileIdB));
                     }
                     else
                     {
-                        array_push($otherProfiles, $profileController->read($contact->profileIdA));
+                        $otherProfiles = array_merge($otherProfiles, $profileController->read($contact->profileIdA));
                     }
                 }
 

@@ -4,7 +4,7 @@ header("Access-Control-Allow-Methods: GET"); // specifies the method or methods 
 header("Access-Control-Max-Age: 3600"); // indicates how long (in seconds) the results of a preflight request can be cached
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With"); // indicates which HTTP headers can be used during the actual request
 
-include_once "../config/database.php";
+include_once "../configuration/database.php";
 include_once "../entities/contact_controller.php";
 include_once "../entities/contact.php";
 
@@ -30,8 +30,8 @@ try
         (
             "id" => $contact->id,
             "last_contact" => $contact->lastContact,
-            "profile_guid_a" => $contact->profileIdA,
-            "profile_guid_b" => $contact->profileIdB
+            "profile_id_a" => $contact->profileIdA,
+            "profile_id_b" => $contact->profileIdB
         );
 
         array_push($output["body"], $item);

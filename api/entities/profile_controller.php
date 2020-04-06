@@ -15,7 +15,7 @@ class ProfileController
         $query = "INSERT INTO profile (guid)
                   VALUES ('" . $guid . "')";
 
-        executeQuery($query);
+        $this->executeQuery($query);
 
         return $guid;
     }
@@ -26,8 +26,8 @@ class ProfileController
                   FROM profile
                   WHERE id = " . $id;
 
-        $statement = executeQuery($query);
-        $profiles = fetchProfiles($statement);
+        $statement = $this->executeQuery($query);
+        $profiles = ProfileController::fetchProfiles($statement);
 
         return $profiles;
     }
@@ -37,8 +37,8 @@ class ProfileController
         $query = "SELECT id, guid, state_id
                   FROM profile";
 
-        $statement = executeQuery($query);
-        $profiles = fetchProfiles($statement);
+        $statement = $this->executeQuery($query);
+        $profiles = ProfileController::fetchProfiles($statement);
 
         return $profiles;
     }
@@ -49,7 +49,7 @@ class ProfileController
                   SET state_id = " . $stateId . "
                   WHERE id = " . $id;
 
-        executeQuery($query);
+        $this->executeQuery($query);
     }
 
     public function delete($id)
@@ -57,7 +57,7 @@ class ProfileController
         $query = "DELETE FROM profile
                   WHERE id = " . $id;
 
-        executeQuery($query);
+        $this->executeQuery($query);
     }
 
     public function find($guid)
@@ -66,8 +66,8 @@ class ProfileController
                   FROM profile
                   WHERE guid = '" . $guid . "'";
 
-        $statement = executeQuery($query);
-        $profiles = fetchProfiles($statement);
+        $statement = $this->executeQuery($query);
+        $profiles = ProfileController::fetchProfiles($statement);
 
         return $profiles;
     }

@@ -14,8 +14,8 @@ class StateController
                   FROM state
                   WHERE id = " . $id;
 
-        $statement = executeQuery($query);
-        $states = fetchStates($statement);
+        $statement = $this->executeQuery($query);
+        $states = StateController::fetchStates($statement);
 
         return $states;
     }
@@ -25,8 +25,8 @@ class StateController
         $query = "SELECT id, name
                   FROM state";
 
-        $statement = executeQuery($query);
-        $states = fetchStates($statement);
+        $statement = $this->executeQuery($query);
+        $states = StateController::fetchStates($statement);
 
         return $states;
     }
@@ -37,8 +37,8 @@ class StateController
                   FROM state
                   WHERE name = '" . $name . "'";
 
-        $statement = executeQuery($query);
-        $states = fetchStates($statement);
+        $statement = $this->executeQuery($query);
+        $states = StateController::fetchStates($statement);
 
         return $states;
     }
@@ -59,9 +59,9 @@ class StateController
 
         while ($row = $statement->fetch(PDO::FETCH_ASSOC))
         {
-            $states = new State();
-            $states->id = $row["id"];
-            $states->name = $row["name"];
+            $state = new State();
+            $state->id = $row["id"];
+            $state->name = $row["name"];
 
             array_push($states, $state);
         }

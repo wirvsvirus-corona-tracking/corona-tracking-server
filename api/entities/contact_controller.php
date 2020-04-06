@@ -13,7 +13,7 @@ class ContactController
         $query = "INSERT INTO contact (profile_id_a, profile_id_b)
                   VALUES (" . $profileIdA . ", " . $profileIdB . ")";
 
-        executeQuery($query);
+        $this->executeQuery($query);
     }
 
     public function read($id)
@@ -22,8 +22,8 @@ class ContactController
                   FROM contact
                   WHERE id = " . $id;
 
-        $statement = executeQuery($query);
-        $contacts = fetchContacts($statement);
+        $statement = $this->executeQuery($query);
+        $contacts = ContactController::fetchContacts($statement);
 
         return $contacts;
     }
@@ -33,8 +33,8 @@ class ContactController
         $query = "SELECT id, last_contact, profile_id_a, profile_id_b
                   FROM contact";
 
-        $statement = executeQuery($query);
-        $contacts = fetchContacts($statement);
+        $statement = $this->executeQuery($query);
+        $contacts = ContactController::fetchContacts($statement);
 
         return $contacts;
     }
@@ -45,7 +45,7 @@ class ContactController
                   SET last_contact = CURRENT_TIMESTAMP
                   WHERE id = " . $id;
 
-        executeQuery($query);
+        $this->executeQuery($query);
     }
 
     public function findByProfile($profileId)
@@ -54,8 +54,8 @@ class ContactController
                   FROM contact
                   WHERE profile_id_a = " . $profileId . " OR profile_id_b = " . $profileId;
 
-        $statement = executeQuery($query);
-        $contacts = fetchContacts($statement);
+        $statement = $this->executeQuery($query);
+        $contacts = ContactController::fetchContacts($statement);
 
         return $contacts;
     }
@@ -66,8 +66,8 @@ class ContactController
                   FROM contact
                   WHERE (profile_id_a = " . $profileIdA . " AND profile_id_b = " . $profileIdB . ") OR (profile_id_a = " . $profileIdB . " AND profile_id_b = " . $profileIdA . ")";
 
-        $statement = executeQuery($query);
-        $contacts = fetchContacts($statement);
+        $statement = $this->executeQuery($query);
+        $contacts = ContactController::fetchContacts($statement);
 
         return $contacts;
     }
