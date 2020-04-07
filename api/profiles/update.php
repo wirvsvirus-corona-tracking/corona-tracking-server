@@ -30,7 +30,7 @@ try
 
         foreach ($profiles as $profile)
         {
-            $profileController->update($profile->id, $stateId);
+            $profileController->update($profile->id, $stateId); // the actual update of the current profile
 
             if ($stateId == 3) // 3 = infected
             {
@@ -38,6 +38,8 @@ try
 
                 $contactController = new ContactController($connection);
                 $contacts = $contactController->findByProfile($profile->id);
+
+                // gather all the other profiles
 
                 $otherProfiles = array();
 
@@ -53,10 +55,10 @@ try
                     }
                 }
 
+                // update the other profiles from "not infected" to "maybe infected"
+
                 foreach ($otherProfiles as $otherProfile)
                 {
-                    // update the other profiles from "not infected" to "maybe infected"
-
                     if ($otherProfile->stateId == 1)  // 1 = not infected
                     {
                         $profileController->update($otherProfile->id, 2); // 2 = maybe infected

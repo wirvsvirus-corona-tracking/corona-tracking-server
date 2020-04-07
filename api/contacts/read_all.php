@@ -26,13 +26,11 @@ try
     {
         ++$output["count"];
 
-        $item = array
-        (
-            "id" => $contact->id,
-            "last_contact" => $contact->lastContact,
-            "profile_id_a" => $contact->profileIdA,
-            "profile_id_b" => $contact->profileIdB
-        );
+        $item = array();
+        $item["id"] = $contact->id;
+        $item["last_contact"] = $contact->lastContact;
+        $item["profile_id_a"] = $contact->profileIdA;
+        $item["profile_id_b"] = $contact->profileIdB;
 
         array_push($output["body"], $item);
     }

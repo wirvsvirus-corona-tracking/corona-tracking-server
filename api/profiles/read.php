@@ -30,12 +30,10 @@ try
         {
             ++$output["count"];
 
-            $item = array
-            (
-                "id" => $profile->id,
-                "guid" => $profile->guid,
-                "state_id" => $profile->stateId
-            );
+            $item = array();
+            $item["id"] = $profile->id;
+            $item["guid"] = $profile->guid;
+            $item["state_id"] = $profile->stateId;
 
             array_push($output["body"], $item);
         }

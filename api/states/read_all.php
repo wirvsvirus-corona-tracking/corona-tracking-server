@@ -26,11 +26,9 @@ try
     {
         ++$output["count"];
 
-        $item = array
-        (
-            "id" => $state->id,
-            "name" => $state->name
-        );
+        $item = array();
+        $item["id"] = $state->id;
+        $item["name"] = $state->name;
 
         array_push($output["body"], $item);
     }
